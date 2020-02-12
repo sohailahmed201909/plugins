@@ -1,0 +1,52 @@
+
+?action=start&importid=454
+
+
+//start
+nohup php /PATH/TO/RUN.PHP 454 &
+
+// get the process id (pid) for run.php
+
+// save process id in db
+// update import status to processing
+
+
+
+?action=stop&importid=454
+
+// fetch pid from importid
+
+// cancel
+kill pid
+
+// update status to cancelled
+
+// on the front end, read the log file, and show the progress
+// progress: 56 / 100 products processed
+// verbose logs on front end
+
+$file='/home/user/log.log';
+$lastpos = 0;
+while (true) {
+	// check import status
+    usleep(300000); //0.3 s
+    clearstatcache(false, $file);
+    $len = filesize($file);
+    if ($len < $lastpos) {
+        //file deleted or reset
+        $lastpos = $len;
+    }
+    elseif ($len > $lastpos) {
+        $f = fopen($file, "rb");
+        if ($f === false)
+            die();
+        fseek($f, $lastpos);
+        while (!feof($f)) {
+            $buffer = fread($f, 4096);
+            echo $buffer;
+            flush();
+        }
+        $lastpos = ftell($f);
+        fclose($f);
+    }
+}
